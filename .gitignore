@@ -213,3 +213,8 @@ ModelManifest.xml
 
 # Claude Code personal settings
 .claude/settings.local.json
+
+# Trade display (Vite)
+trade-display/dist/
+trade-display/.env.local
+trade-display/.env.*.local

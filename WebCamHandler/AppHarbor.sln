@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HubServer", "WebCamHandler\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HubServer.Tests", "HubServer.Tests\HubServer.Tests.csproj", "{B6AC5FCD-E7FA-4568-A61B-4AE7B361C0A6}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TradeFeed.Contracts", "..\TradeFeed\TradeFeed.Contracts\TradeFeed.Contracts.csproj", "{1C8EA3C3-56A9-4188-94AE-27D39855A0F7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{B6AC5FCD-E7FA-4568-A61B-4AE7B361C0A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6AC5FCD-E7FA-4568-A61B-4AE7B361C0A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6AC5FCD-E7FA-4568-A61B-4AE7B361C0A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C8EA3C3-56A9-4188-94AE-27D39855A0F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C8EA3C3-56A9-4188-94AE-27D39855A0F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C8EA3C3-56A9-4188-94AE-27D39855A0F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C8EA3C3-56A9-4188-94AE-27D39855A0F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

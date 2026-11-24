@@ -1,0 +1,23 @@
+{
+  "name": "trade-display",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Read-only real-time trade display fed by HubServer's trade hub.",
+  "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@microsoft/signalr": "11.0.0"
+  },
+  "devDependencies": {
+    "vite": "8.3.7",
+    "vitest": "5.1.0"
+  }
+}

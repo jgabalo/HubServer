@@ -11,13 +11,17 @@ namespace HubServer.Tests
         /// <summary>
         /// Builds and starts a SignalR client connected to the in-memory test server.
         /// </summary>
-        public static async Task<HubConnection> ConnectAsync(WebApplicationFactory<Program> factory, string hubPath)
+        public static async Task<HubConnection> ConnectAsync(WebApplicationFactory<Program> factory, string hubPath, IDictionary<string, string>? headers = null)
         {
             HubConnection connection = new HubConnectionBuilder()
                 .WithUrl(new Uri(factory.Server.BaseAddress, hubPath), options =>
                 {
                     options.HttpMessageHandlerFactory = _ => factory.Server.CreateHandler();
                     options.Transports = HttpTransportType.LongPolling;
+                    foreach (KeyValuePair<string, string> header in headers ?? new Dictionary<string, string>())
+                    {
+                        options.Headers[header.Key] = header.Value;
+                    }
                 })
                 .Build();
 

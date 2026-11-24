@@ -17,6 +17,12 @@ indent_size = 2
 [*.md]
 trim_trailing_whitespace = false
 
+# npm writes this file itself.
+[package-lock.json]
+indent_size = unset
+end_of_line = unset
+insert_final_newline = unset
+
 # Vendored third-party assets: leave untouched.
 [WebCamHandler/WebCamHandler/wwwroot/**]
 indent_style = unset

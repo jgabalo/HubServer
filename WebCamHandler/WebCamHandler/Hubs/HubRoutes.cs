@@ -9,5 +9,6 @@
     {
         public const string Handler = "/signalr/handlerHub";
         public const string Chatter = "/signalr/chatterHub";
+        public const string Trade = TradeFeed.Contracts.TradeHubContract.Route;
     }
 }

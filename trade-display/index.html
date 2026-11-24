@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en-NZ">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Read-only, real-time trade display." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Live Trade Display</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
+          <polyline points="3,17 9,11 13,15 21,7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+          <polyline points="15,7 21,7 21,13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <h1>Live Trades</h1>
+        <span class="badge" title="This display cannot place or modify orders.">View only</span>
+      </div>
+      <div class="status-bar" role="status" aria-live="polite">
+        <span class="pill" id="conn-status" data-state="connecting"><span class="dot"></span><span class="label">Connecting</span></span>
+        <span class="pill" id="feed-status" data-state="offline"><span class="dot"></span><span class="label">Feed offline</span></span>
+        <span class="metric"><strong id="rate">0.0</strong> trades/s</span>
+        <time class="metric clock" id="clock"></time>
+      </div>
+    </header>
+
+    <main>
+      <section class="tickers" id="tickers" aria-label="Market summary"></section>
+
+      <section class="tape" aria-labelledby="tape-title">
+        <div class="tape-head">
+          <h2 id="tape-title">Trade tape</h2>
+          <div class="filters" id="filters" role="group" aria-label="Filter by symbol"></div>
+          <button type="button" class="pause" id="pause" aria-pressed="false">Pause</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Time (<span id="tape-zone">NZT</span>)</th>
+                <th scope="col">Symbol</th>
+                <th scope="col">Side</th>
+                <th scope="col" class="num">Price</th>
+                <th scope="col" class="num">Quantity</th>
+                <th scope="col" class="num">Value</th>
+              </tr>
+            </thead>
+            <tbody id="tape-body"></tbody>
+          </table>
+          <p class="empty" id="tape-empty">Waiting for trades from the hub...</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>Source: <strong id="source-name">waiting</strong></span>
+      <span>Hub: <code id="hub-url"></code></span>
+      <span>Market data for display only. No orders can be placed from this screen.</span>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

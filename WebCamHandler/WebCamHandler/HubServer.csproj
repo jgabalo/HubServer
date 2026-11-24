@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\TradeFeed\TradeFeed.Contracts\TradeFeed.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <InternalsVisibleTo Include="HubServer.Tests" />
   </ItemGroup>
 
