@@ -1,49 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using WebCamHandler.Models;
-using Microsoft.AspNet.SignalR;
-using Microsoft.AspNet.SignalR.Hubs;
+﻿using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
+using WebCamHandler.Models;
 
 namespace WebCamHandler
 {
+    /// <summary>
+    /// Process-wide registry of webcam components. Registered as a DI singleton.
+    /// </summary>
     public class Handler
     {
-        private readonly static Lazy<Handler> _instance = new Lazy<Handler>(() => new Handler(GlobalHost.ConnectionManager.GetHubContext<HandlerHub>().Clients));
+        private readonly IHubContext<HandlerHub> _hubContext;
 
-        private IHubConnectionContext<dynamic> Clients { get; set; }
+        private readonly List<AccessControl> _masterList = new List<AccessControl>();
 
-        private Handler(IHubConnectionContext<dynamic> clients)
+        public Handler(IHubContext<HandlerHub> hubContext)
         {
-            Clients = clients;
+            _hubContext = hubContext;
         }
 
-        public static Handler Instance
+        public async Task ProcessAccess(string data)
         {
-            get { return _instance.Value; }
-        }
-
-        private List<AccessControl> _masterList = new List<AccessControl>();
-
-        public void ProcessAccess(string data)
-        {
-            Dictionary<string, string> pushData = JsonConvert.DeserializeObject<Dictionary<string, string>>(data);
+            Dictionary<string, string> pushData = JsonConvert.DeserializeObject<Dictionary<string, string>>(data)!;
             string connectionId = pushData["ConnectionId"];
             string ipAddress = pushData["IpAddress"];
 
-            if(_masterList.Exists(x => x.ConnectionId == connectionId))
+            if (_masterList.Exists(x => x.ConnectionId == connectionId))
             {
-                Clients.Client(connectionId).processAccess(ipAddress);
+                await _hubContext.Clients.Client(connectionId).SendAsync("processAccess", ipAddress);
             }
         }
 
-        public void AddComponent(string data)
+        public async Task AddComponent(string data)
         {
             try
             {
                 if (!string.IsNullOrEmpty(data))
                 {
-                    AccessControl accessdata = JsonConvert.DeserializeObject<AccessControl>(data);
+                    AccessControl? accessdata = JsonConvert.DeserializeObject<AccessControl>(data);
 
                     if (accessdata != null)
                     {
@@ -59,7 +52,7 @@ namespace WebCamHandler
 
                     string masterData = JsonConvert.SerializeObject(_masterList);
 
-                    Clients.All.broadCastData(masterData);
+                    await _hubContext.Clients.All.SendAsync("broadCastData", masterData);
                 }
             }
             catch (Exception)
@@ -68,13 +61,13 @@ namespace WebCamHandler
             }
         }
 
-        public void RemoveComponent(string data)
+        public async Task RemoveComponent(string data)
         {
             try
             {
                 if (!string.IsNullOrEmpty(data))
                 {
-                    AccessControl accessdata = JsonConvert.DeserializeObject<AccessControl>(data);
+                    AccessControl? accessdata = JsonConvert.DeserializeObject<AccessControl>(data);
 
                     if (accessdata != null)
                     {
@@ -83,7 +76,7 @@ namespace WebCamHandler
 
                     string masterData = JsonConvert.SerializeObject(_masterList);
 
-                    Clients.All.broadCastData(masterData);
+                    await _hubContext.Clients.All.SendAsync("broadCastData", masterData);
                 }
             }
             catch (Exception)

@@ -1,41 +1,28 @@
-﻿using Microsoft.AspNet.SignalR;
-using Microsoft.AspNet.SignalR.Hubs;
+﻿using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using WebCamHandler.Models;
 
 namespace WebCamHandler.Hubs
 {
+    /// <summary>
+    /// Process-wide chat relay between users and admins. Registered as a DI singleton.
+    /// </summary>
     public class Chatter
     {
-        /// <summary>
-        /// The instance
-        /// </summary>
-        private readonly static Lazy<Chatter> _instance = new Lazy<Chatter>(() => new Chatter(GlobalHost.ConnectionManager.GetHubContext<ChatterHub>().Clients));
+        private readonly IHubContext<ChatterHub> _hubContext;
 
-        private IHubConnectionContext<dynamic> Clients { get; set; }
+        private readonly List<string> _adminConnectionIds = new List<string>();
 
-        private Chatter(IHubConnectionContext<dynamic> clients)
-        {
-            Clients = clients;
-        }
+        private readonly List<UserData> _userConnectionIds = new List<UserData>();
 
         /// <summary>
-        /// Gets the instance.
+        /// Initializes a new instance of the <see cref="Chatter"/> class.
         /// </summary>
-        /// <value>
-        /// The instance.
-        /// </value>
-        public static Chatter Instance
+        /// <param name="hubContext">The chatter hub context.</param>
+        public Chatter(IHubContext<ChatterHub> hubContext)
         {
-            get { return _instance.Value; }
+            _hubContext = hubContext;
         }
-
-        private List<string> _adminConnectionIds = new List<string>();
-
-        private List<UserData> _userConnectionIds = new List<UserData>();
 
         /// <summary>
         /// Adds the user to list.
@@ -43,7 +30,7 @@ namespace WebCamHandler.Hubs
         /// <param name="userDataJson">The user data json.</param>
         public void AddUserToList(string userDataJson)
         {
-            UserData userData = JsonConvert.DeserializeObject<UserData>(userDataJson);
+            UserData userData = JsonConvert.DeserializeObject<UserData>(userDataJson)!;
 
             if (!_userConnectionIds.Exists(x => x.ConnectionId == userData.ConnectionId))
             {
@@ -57,7 +44,7 @@ namespace WebCamHandler.Hubs
         /// <param name="connectionId">The connection identifier.</param>
         public void AddAdminToList(string connectionId)
         {
-            if(!_adminConnectionIds.Exists(x => x == connectionId))
+            if (!_adminConnectionIds.Exists(x => x == connectionId))
             {
                 _adminConnectionIds.Add(connectionId);
             }
@@ -66,25 +53,29 @@ namespace WebCamHandler.Hubs
         /// <summary>
         /// Sends the admin message.
         /// </summary>
+        /// <param name="userConnectionId">The sending user's connection identifier.</param>
         /// <param name="message">The message.</param>
-        public void SendAdminMessage(string userConnectionId, string message)
+        public async Task SendAdminMessage(string userConnectionId, string message)
         {
-            UserData data = _userConnectionIds.SingleOrDefault(x => x.ConnectionId == userConnectionId); //.Select(x => x.ConnectionId == userConnectionId).Select();
+            UserData data = _userConnectionIds.SingleOrDefault(x => x.ConnectionId == userConnectionId)!;
             string sendMsg = data.Name + ": " + message;
 
             foreach (string connectionId in _adminConnectionIds)
             {
-                Clients.Client(connectionId).sendAdminMessage(sendMsg);
+                await _hubContext.Clients.Client(connectionId).SendAsync("sendAdminMessage", sendMsg);
             }
         }
 
-        public void GetUserData()
+        /// <summary>
+        /// Sends the list of registered users to every admin.
+        /// </summary>
+        public async Task GetUserData()
         {
             string userData = JsonConvert.SerializeObject(_userConnectionIds);
 
             foreach (string connectionId in _adminConnectionIds)
             {
-                Clients.Client(connectionId).sendUserData(userData);
+                await _hubContext.Clients.Client(connectionId).SendAsync("sendUserData", userData);
             }
         }
 
@@ -93,13 +84,13 @@ namespace WebCamHandler.Hubs
         /// </summary>
         /// <param name="userDataJson">The user data json.</param>
         /// <param name="message">The message.</param>
-        public void SendUserMessage(string userDataJson, string message)
+        public async Task SendUserMessage(string userDataJson, string message)
         {
-            UserData userData = JsonConvert.DeserializeObject<UserData>(userDataJson);
+            UserData userData = JsonConvert.DeserializeObject<UserData>(userDataJson)!;
 
             if (_userConnectionIds.Exists(x => x.ConnectionId == userData.ConnectionId))
             {
-                Clients.Client(userData.ConnectionId).sendUserMessage(message);
+                await _hubContext.Clients.Client(userData.ConnectionId!).SendAsync("sendUserMessage", message);
             }
         }
     }

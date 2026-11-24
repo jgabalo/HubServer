@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNet.SignalR;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using WebCamHandler.Models;
+﻿using Microsoft.AspNetCore.SignalR;
 
 namespace WebCamHandler
 {
@@ -10,35 +6,30 @@ namespace WebCamHandler
     {
         private readonly Handler _handler;
 
-        public HandlerHub() : this(Handler.Instance)
-        { }
-
         public HandlerHub(Handler handler)
         {
             _handler = handler;
         }
 
-        private List<AccessControl> _masterList = new List<AccessControl>();
-
-        public void Send(string name, string message)
+        public Task Send(string name, string message)
         {
             // Call the addNewMessageToPage method to update clients.
-            Clients.All.addNewMessageToPage(name, message);
+            return Clients.All.SendAsync("addNewMessageToPage", name, message);
         }
 
-        public void AllowAccess(string data)
+        public Task AllowAccess(string data)
         {
-            Handler.Instance.ProcessAccess(data);
+            return _handler.ProcessAccess(data);
         }
 
-        public void AddComponent(string data)
+        public Task AddComponent(string data)
         {
-            Handler.Instance.AddComponent(data);
+            return _handler.AddComponent(data);
         }
 
-        public void RemoveComponent(string data)
+        public Task RemoveComponent(string data)
         {
-            Handler.Instance.RemoveComponent(data);
+            return _handler.RemoveComponent(data);
         }
     }
 }

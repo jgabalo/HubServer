@@ -1,22 +1,10 @@
-﻿using Microsoft.AspNet.SignalR;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using WebCamHandler.Models;
+﻿using Microsoft.AspNetCore.SignalR;
 
 namespace WebCamHandler.Hubs
 {
     public class ChatterHub : Hub
     {
         private readonly Chatter _chatter;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ChatterHub"/> class.
-        /// </summary>
-        public ChatterHub() : this(Chatter.Instance)
-        {
-
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ChatterHub"/> class.
@@ -30,10 +18,10 @@ namespace WebCamHandler.Hubs
         /// <summary>
         /// Access for Users
         /// </summary>
-        /// <param name="connectionId">The connection identifier.</param>
+        /// <param name="userDataJson">The user data json.</param>
         public void UserAccess(string userDataJson)
         {
-            Chatter.Instance.AddUserToList(userDataJson);
+            _chatter.AddUserToList(userDataJson);
         }
 
         /// <summary>
@@ -42,26 +30,27 @@ namespace WebCamHandler.Hubs
         /// <param name="connectionId">The connection identifier.</param>
         public void AdminAccess(string connectionId)
         {
-            Chatter.Instance.AddAdminToList(connectionId);
+            _chatter.AddAdminToList(connectionId);
         }
 
-        public void GetUserData()
+        public Task GetUserData()
         {
-            Chatter.Instance.GetUserData();
+            return _chatter.GetUserData();
         }
 
         /// <summary>
         /// Sends the message to admin.
         /// </summary>
+        /// <param name="connectionId">The sending user's connection identifier.</param>
         /// <param name="message">The message.</param>
-        public void SendMessageToAdmin(string connectionId, string message)
+        public Task SendMessageToAdmin(string connectionId, string message)
         {
-            Chatter.Instance.SendAdminMessage(connectionId, message);
+            return _chatter.SendAdminMessage(connectionId, message);
         }
 
-        public void SendMessageToUser(string userDataJson, string message)
+        public Task SendMessageToUser(string userDataJson, string message)
         {
-            Chatter.Instance.SendUserMessage(userDataJson, message);
+            return _chatter.SendUserMessage(userDataJson, message);
         }
     }
 }
